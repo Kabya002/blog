@@ -1,12 +1,18 @@
 {% include "header.html" %}
-<!-- Page Header-->
+
 <header class="masthead" style="background-image: url('../static/assets/img/about-bg.jpg')">
   <div class="container position-relative px-4 px-lg-5">
     <div class="row gx-4 gx-lg-5 justify-content-center">
       <div class="col-md-10 col-lg-8 col-xl-7">
         <div class="page-heading">
-          <h1>Your Profile</h1>
-          <span class="subheading">Welcome, {{ current_user.name }}!</span>
+          <h1>{{ "Your Profile" if user.id == current_user.id else user.name }}</h1>
+          <span class="subheading">
+            {% if user.id == current_user.id %}
+              Welcome, {{ current_user.name }}!
+            {% else %}
+              Viewing {{ user.name }}'s profile
+            {% endif %}
+          </span>
         </div>
       </div>
     </div>
@@ -17,26 +23,33 @@
   <div class="card shadow mb-4">
     <div class="card-body">
       <h4 class="mb-3">Account Information</h4>
-      <p><strong>Name:</strong> {{ current_user.name }}</p>
-      <p><strong>Email:</strong> {{ current_user.email }}</p>
+      <p><strong>Name:</strong> {{ user.name }}</p>
+      <p><strong>Email:</strong> {{ user.email }}</p>
     </div>
   </div>
 
-  <h4>Your Blog Posts</h4>
+  <h4>{{ "Your Blog Posts" if user.id == current_user.id else "Blog Posts by " + user.name }}</h4>
+
   {% if posts %}
     {% for post in posts %}
       <div class="card mb-3 shadow-sm">
         <div class="card-body">
           <h5 class="card-title">{{ post.title }}</h5>
           <p class="card-text text-muted">{{ post.subtitle }}</p>
-          <a href="{{ url_for('show_post', post_id=post.id) }}" class="btn btn-primary btn-sm">View</a>
-          <a href="{{ url_for('edit_post', post_id=post.id) }}" class="btn btn-warning btn-sm">Edit</a>
-          <a href="{{ url_for('delete_post', post_id=post.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this post?');">Delete</a>
+
+          {% if user.id == current_user.id %}
+            <a href="{{ url_for('show_post', post_id=post.id) }}" class="btn btn-primary btn-sm">View</a>
+            <a href="{{ url_for('edit_post', post_id=post.id) }}" class="btn btn-primary btn-sm">Edit</a>
+            <a href="{{ url_for('delete_post', post_id=post.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this post?');">Delete</a>
+          {% else %}
+            <a href="{{ url_for('show_post', post_id=post.id) }}" class="btn btn-outline-primary btn-sm">Read</a>
+          {% endif %}
         </div>
       </div>
     {% endfor %}
   {% else %}
-    <p>You haven’t written any posts yet.</p>
+    <p>{{ "You haven’t written any posts yet." if user.id == current_user.id else "This user hasn’t written any posts yet." }}</p>
   {% endif %}
 </div>
+
 {% include "footer.html" %}

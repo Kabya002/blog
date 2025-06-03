@@ -117,13 +117,23 @@ def admin_only(f):
         return f(*args, **kwargs)        
     return decorated_function
 
+#######################################################################################
 @app.route('/profile')
 @login_required
 def profile():
     posts = BlogPost.query.filter_by(author=current_user).all()
-    return render_template('profile.html', posts=posts)
+    return render_template('profile.html', user=current_user, posts=posts)
 
 ########################################################################################
+
+@app.route('/user/<int:user_id>')
+def user_profile(user_id):
+    user = User.query.get_or_404(user_id)
+    posts = BlogPost.query.filter_by(author=user).all()
+    return render_template('profile.html', user=user, posts=posts)
+
+
+################################################################################################
 @app.route('/')
 def get_all_posts():
     # Query the database for all the posts. Convert the data to a python list.
