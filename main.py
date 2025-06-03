@@ -117,6 +117,12 @@ def admin_only(f):
         return f(*args, **kwargs)        
     return decorated_function
 
+@app.route('/profile')
+@login_required
+def profile():
+    posts = BlogPost.query.filter_by(author=current_user).all()
+    return render_template('profile.html', posts=posts)
+
 ########################################################################################
 @app.route('/')
 def get_all_posts():
@@ -149,7 +155,7 @@ def show_post(post_id):
 
 ##################################################################################################
 @app.route("/new-post", methods=["GET", "POST"])
-@admin_only
+@login_required
 def add_new_post():
     form = CreatePostForm()
     if form.validate_on_submit():
@@ -170,6 +176,7 @@ def add_new_post():
 ###########################################################################################
 # Use a decorator so only an admin user can edit a post
 @app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
+@login_required
 def edit_post(post_id):
     post = db.get_or_404(BlogPost, post_id)
     form = CreatePostForm(obj=post)
@@ -243,6 +250,8 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('get_all_posts'))
+
+############################################################################################
 # Use a decorator so only an admin user can delete a post
 @app.route("/delete/<int:post_id>")
 @admin_only
