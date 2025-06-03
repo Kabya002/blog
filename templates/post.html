@@ -13,7 +13,7 @@
             >Posted by
             <!-- Changed from post.author -->
             <a href="#">{{ post.author.name }}</a>
-            on {{ post.date }}
+            on {{ post.date.strftime("%Y-%m-%d %H:%M") }}
           </span>
         </div>
       </div>
